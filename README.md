@@ -2,6 +2,39 @@
 
 An end-to-end document processing pipeline that accepts any document format (PDF, image, scan), performs OCR to extract raw text, uses LLMs to extract structured data from the text, and validates every extraction against configurable business rules — with a human-in-the-loop review interface for low-confidence results.
 
+## Getting Started
+
+**Docker (recommended):**
+```bash
+cp .env.example .env   # fill in an LLM API key (anthropic/openai/groq)
+docker compose up --build
+```
+This starts Postgres, Redis, the FastAPI ingestion/review API (`:8000`), a Celery
+worker, and the Streamlit review UI (`:8501`).
+
+**Local development:**
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env               # fill in an LLM API key
+python scripts/init_db.py          # requires a running Postgres (see docker-compose.yml)
+python scripts/generate_sample_documents.py   # writes demo files to sample_documents/
+
+uvicorn app.api.main:app --reload            # terminal 1: API
+celery -A app.tasks.celery_app worker -l info # terminal 2: worker
+streamlit run review_ui/streamlit_app.py      # terminal 3: review UI
+```
+
+**Run the tests** (pure logic only -- no DB/LLM/OCR binaries required):
+```bash
+pytest
+```
+
+**Try it end-to-end:** upload `sample_documents/invoice_scanned.png` via the
+Streamlit "Upload" page or `POST /documents`, then watch it move through
+OCR → classification → extraction → validation → routing, and open it from
+the "Review Queue" page once it lands there.
+
 ## Tech Stack
 
 | Component | Tool / Library | Why This Choice |

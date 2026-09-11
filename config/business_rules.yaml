@@ -1,0 +1,34 @@
+# Configurable business rules. Edit this file to add vendors or tune
+# thresholds without touching code.
+
+known_vendors:
+  - name: "Acme Supplies Inc."
+    expected_total_range: [10, 5000]
+    standard_payment_terms: ["Net 30", "Net 60"]
+  - name: "Northwind Traders"
+    expected_total_range: [10, 2000]
+    standard_payment_terms: ["Due on receipt", "Net 15"]
+  - name: "Globex Corporation"
+    expected_total_range: [50, 20000]
+    standard_payment_terms: ["Net 30", "Net 45"]
+
+standard_payment_terms_global:
+  - "Net 15"
+  - "Net 30"
+  - "Net 45"
+  - "Net 60"
+  - "Due on receipt"
+
+required_contract_clause_types:
+  - "termination"
+  - "governing_law"
+  - "obligations"
+
+# Termination language that reads as unusually one-sided / broad and
+# should be flagged for legal review rather than auto-approved.
+broad_termination_keywords:
+  - "at any time"
+  - "sole discretion"
+  - "without cause"
+  - "for any reason"
+  - "immediately upon notice"
